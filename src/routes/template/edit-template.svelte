@@ -1,30 +1,78 @@
-<script>
-    
-    let people = {
-        general: {
-            bp: 150,
-            puls: 78,
-            restrate: 16,
-            temp: 98,
-            height: 73,
-            weight: 240,
-            bmi: 31.66,
-            chiefcomplaint: '',
-            hpi: '',
-            subject: '',
-            allegies: '',
-            currentmeds: '',
-            medicalhistory: '',
-            socialhistory: '',
-            familyhistory: '',
-            object: '',
-            assessment: '',
-            plan: '',
+<script context='module'>
+
+    export async function preload(page, session) {
+        try {
+            const res = await this.fetch('./template.json');
+            if(res.ok) {
+                const templates = await res.json();
+                return {templates};
+            }
+
+        } catch (e) {
+            console.error(e.message);
         }
     }
 
-    function saveTemplateInfo() {
-        alert("SaveTemplageInfo");
+</script>
+
+<script>
+
+    export let templates;
+
+    let i = 0;
+    let value = '';
+    let activeClass = 'Chief Complaint';
+
+    $: selected = templates[i];
+	$: reset_inputs(selected);
+
+    function reset_inputs(template) {
+		value = template ? template : '';
+        if (activeClass !== 'Chief Complaint') {
+            activeClass = 'Chief Complaint';
+        }
+	}
+
+    async function saveTemplateInfo() {
+        if(!value) {
+            alert("please select template");
+            return;
+        }
+        const functionName = 'saveTemplateInfo';
+        const tmpContent = { value, functionName };
+        try {
+            const options = {
+                method: value.tmc_id ? 'PUT' : 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify(tmpContent)
+            }
+            const path = './template.json';
+            const res = await fetch(path, options);
+            if(res.ok) {
+                if(options.method === 'PUT') {
+                    alert('successfully updated');
+                } else {
+                    alert('successfully saved');   
+                }
+                try {
+                    const res = await fetch('./template.json');
+                    if(res.ok) {
+                        templates = await res.json();
+                        return {templates};
+                    }
+
+                } catch (e) {
+                    console.error(e.message);
+                }
+            }
+
+        } catch (e) {
+            console.error(e.message);
+        }
+    }
+
+    function makeActive(e) {
+        activeClass = e.target.innerText;
     }
 
 </script>
@@ -51,6 +99,8 @@
         height: 30px;
         border-radius: 5px;
         margin-left: 23px;
+        padding-left: 5px;
+        font-size: 16px;
     }
 
     .edit-template-box .edit-template-content {
@@ -101,25 +151,32 @@
     }
     .edit-template-box .edit-template-content .patient-info .info-tabs > button {
         width: 90px;
-        height: 40px;        
+        height: 35px;        
+        font-size: 12px;
     }
     .edit-template-box .edit-template-content .patient-info .info-tabs > button.active {
         background-color: white;        
     }
     .edit-template-box .edit-template-content .patient-info .info-text {
         border: 1px solid grey;
-        height: 160px;
-        padding: 10px;
+        height: 180px;
+        padding: 5px;
         margin-top: 10px;
     }
-    .edit-template-box .edit-template-content .patient-info .info-text > #info-textarea {
+    .edit-template-box .edit-template-content .patient-info .info-text > .info-textarea {
         width: 99.5%;
         height: 97%;
         background-color: #f7f6f6;
     }
-    .edit-template-box .edit-template-content .patient-info .info-text > #info-textarea:focus {
+    .edit-template-box .edit-template-content .patient-info .info-text > .info-textarea:focus {
         border: 1px solid #db7b29;
         outline: none;
+    }
+    .edit-template-box .edit-template-content .patient-info .info-text .textShow {
+        display: block;
+    }
+    .edit-template-box .edit-template-content .patient-info .info-text .textHide {
+        display: none;
     }
 
     .edit-template-box .edit-template-footer {
@@ -128,9 +185,83 @@
     .edit-template-box .edit-template-footer button {
         width: 100px;
         height: 35px;
-        background-color: #96be06;
+        background-color: #3264d1;
+        border: 1px solid #3264d1;
         color: white;
         border-radius: 5px;
+
+        cursor: pointer;
+		display: inline-block;
+		position: relative;
+		transition: 0.5s;
+    }
+    .edit-template-box .edit-template-footer button:after {
+		content: "☑";
+        font-size: 16px;
+		position: absolute;
+		opacity: 0;  
+		top: 5px;
+		left: -10px;
+		transition: 0.5s;
+	}
+	.edit-template-box .edit-template-footer button:hover{
+		padding-right: 10px;
+		padding-left: 20px;
+	}
+	.edit-template-box .edit-template-footer button:hover:after {
+		opacity: 1;
+		left: 10px;
+	}
+
+    @media screen and (max-width: 1024px) {
+        .edit-template-box .edit-template-content .patient-info .info-tabs {
+            width: 900px;
+        }
+    }
+
+    @media screen and (max-width: 768px) {
+        .edit-template-box .edit-template-content .patient-info .info-tabs {
+            width: 680px;
+        }
+        .edit-template-box .edit-template-content .patient-value {
+            width: 600px;
+        }
+        .edit-template-box .edit-template-content .patient-value div input {
+            width: 70px;
+            height: 20px;
+        }
+    }
+
+    @media screen and (max-width: 550px) {
+        .edit-template-box .edit-template-content .patient-value {
+            width: 300px;
+            flex-wrap: wrap;
+        }
+        .edit-template-box .edit-template-content .patient-info .info-tabs {
+            width: 400px;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .edit-template-box .edit-template-footer {    
+            margin-top: 180px;
+            margin-bottom: 20px;
+        }
+    }
+
+    @media screen and (max-width: 400px) {
+        .edit-template-box .edit-template-header > #templateName {
+            width: 300px;
+            margin-left: 0px;
+        }
+        .edit-template-box .edit-template-content .patient-value {
+            width: 250px;
+            flex-wrap: wrap;
+        }
+        .edit-template-box .edit-template-content .patient-info .info-tabs {
+            width: 300px;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
     }
 
 </style>
@@ -145,59 +276,70 @@
     <div class="edit-template-box">      
         <div class="edit-template-header">
             <span>Select Template: </span>
-            <select name="templateName" id="templateName">
-                <option value="general">general</option>
-                <option value="general">urgent</option>
-                <option value="general">simple</option>
+            <select name="templateName" id="templateName" bind:value={i}>
+                <option value="#">--- select template ---</option>
+                {#each templates as tn, i}
+                    <option value={i}>{tn.name}</option>
+                {/each}
             </select>
         </div>
         <div class="edit-template-content">
             <div class="patient-value">
                 <div class="bp">
                     <span>BP</span>
-                    <input type="text" />
+                    <input type="text" bind:value={value.bp} />
                 </div>
                 <div class="puls">
                     <span>Puls</span>
-                    <input type="text" />
+                    <input type="text"  bind:value={value.puls} />
                 </div>
                 <div class="resprate">
                     <span>Resp, Rate</span>
-                    <input type="text" />
+                    <input type="text" bind:value={value.resprate} />
                 </div>
                 <div class="temp">
                     <span>Temp</span>
-                    <input type="text" />
+                    <input type="text" bind:value={value.temp} />
                 </div>
                 <div class="height">
                     <span>Height</span>
-                    <input type="text" />
+                    <input type="text" bind:value={value.height} />
                 </div>
                 <div class="weight">
                     <span>Weight</span>
-                    <input type="text" />
+                    <input type="text" bind:value={value.weight} />
                 </div>
                 <div class="bmi">
                     <span>BMI</span>
-                    <input type="text" />
+                    <input type="text" bind:value={value.bmi} />
                 </div>
             </div>
             <div class="patient-info">
                 <div class="info-tabs">
-                    <button class="btn-info active">Chief Complaint</button>
-                    <button class="btn-info">HPI</button>
-                    <button class="btn-info">Subject</button>
-                    <button class="btn-info">Allergies</button>
-                    <button class="btn-info">Current Meds</button>
-                    <button class="btn-info">Medical History</button>
-                    <button class="btn-info">Social History</button>
-                    <button class="btn-info">Family History</button>
-                    <button class="btn-info">Object</button>
-                    <button class="btn-info">Assessment</button>
-                    <button class="btn-info">Plan</button>
+                    <button class="{activeClass=='Chief Complaint'?'active':''}" on:click={makeActive}>Chief Complaint</button>
+                    <button class="{activeClass=='HPI'?'active':''}" on:click={makeActive}>HPI</button>
+                    <button class="{activeClass=='Subject'?'active':''}" on:click={makeActive}>Subject</button>
+                    <button class="{activeClass=='Allergies'?'active':''}" on:click={makeActive}>Allergies</button>
+                    <button class="{activeClass=='Current Meds'?'active':''}" on:click={makeActive}>Current Meds</button>
+                    <button class="{activeClass=='Medical History'?'active':''}" on:click={makeActive}>Medical History</button>
+                    <button class="{activeClass=='Social History'?'active':''}" on:click={makeActive}>Social History</button>
+                    <button class="{activeClass=='Family History'?'active':''}" on:click={makeActive}>Family History</button>
+                    <button class="{activeClass=='Object'?'active':''}" on:click={makeActive}>Object</button>
+                    <button class="{activeClass=='Assessment'?'active':''}" on:click={makeActive}>Assessment</button>
+                    <button class="{activeClass=='Plan'?'active':''}" on:click={makeActive}>Plan</button>
                 </div>
                 <div class="info-text">
-                    <textArea id="info-textarea"></textArea>
+                    <textarea class="info-textarea {activeClass=='Chief Complaint'?'textShow':'textHide'}"  id="chiefcomplaint" bind:value={value.chiefcomplaint} />
+                    <textarea class="info-textarea {activeClass=='HPI'?'textShow':'textHide'}" id="hpi" bind:value={value.hpi} />
+                    <textarea class="info-textarea {activeClass=='Subject'?'textShow':'textHide'}" id="subject" bind:value={value.subject} />
+                    <textarea class="info-textarea {activeClass=='Allergies'?'textShow':'textHide'}" id="allergies" bind:value={value.allergies} />
+                    <textarea class="info-textarea {activeClass=='Current Meds'?'textShow':'textHide'}" id="currentmeds" bind:value={value.currentmeds} />
+                    <textarea class="info-textarea {activeClass=='Medical History'?'textShow':'textHide'}" id="medicalhistory" bind:value={value.medicalhistory} />
+                    <textarea class="info-textarea {activeClass=='Social History'?'textShow':'textHide'}" id="socialhistory" bind:value={value.socialhistory} />
+                    <textarea class="info-textarea {activeClass=='Family History'?'textShow':'textHide'}" id="familyhistory" bind:value={value.familyhistory} />
+                    <textarea class="info-textarea {activeClass=='Object'?'textShow':'textHide'}" id="object" bind:value={value.object} />
+                    <textarea class="info-textarea {activeClass=='Assessment'?'textShow':'textHide'}" id="assessment" bind:value={value.assessment} />
+                    <textarea class="info-textarea {activeClass=='Plan'?'textShow':'textHide'}" id="plan" bind:value={value.plan} />
                 </div>
             </div>
         </div>
