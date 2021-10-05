@@ -19,7 +19,7 @@
 
     export let templates;
 
-    let i = 0;
+    let i = "#";
     let value = '';
     let activeClass = 'Chief Complaint';
 

@@ -17,6 +17,8 @@
 
 <script>
 
+    import { goto } from '@sapper/app';
+
     // export let patients;
     export let templates;
 
@@ -47,7 +49,6 @@
             return ;
         }
         let useTemplateInfo = {template_id: value.template_id, patient_id: value.patient_id, doctor_id: value.doctor_id, patient_name: name, patient_last_name: last_name, patient_gender: gender, patient_option: option};
-        console.log(value);
         // if (!newTemplateName) {
         //     alert("Please write template name");
         //     return ;
@@ -65,16 +66,7 @@
                 if(res.ok) {
                     alert('successfully saved');
                     clearState();
-                    try {
-                        const res = await fetch('./template/newtemplate.json');
-                        if(res.ok) {
-                            templates = await res.json();
-                            return {templates};
-                        }
-
-                    } catch (e) {
-                        console.error(e.message);
-                    }
+                    goto('/template/edit-template');
                 }
                 
             } 
