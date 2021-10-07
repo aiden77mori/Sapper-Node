@@ -2,7 +2,7 @@
 
     export async function preload(page, session) {
         try {
-            const res = await this.fetch('./template.json');
+            const res = await this.fetch('./template/edittemplate.json');
             if(res.ok) {
                 const templates = await res.json();
                 return {templates};
@@ -38,24 +38,32 @@
             alert("please select template");
             return;
         }
-        const functionName = 'saveTemplateInfo';
-        const tmpContent = { value, functionName };
+        let functionName = '';
+        
+        
+
         try {
+            if(value.tmc_id) {
+                functionName = 'saveTemplateInfoput';
+            } else {
+                functionName = 'saveTemplateInfopost';
+            }
+            const tmpContent = { value, functionName };
             const options = {
-                method: value.tmc_id ? 'PUT' : 'POST',
+                method: 'POST',
                 headers: {'Content-Type':'application/json'},
                 body: JSON.stringify(tmpContent)
             }
-            const path = './template.json';
+            const path = './template/edittemplate.json';
             const res = await fetch(path, options);
             if(res.ok) {
-                if(options.method === 'PUT') {
+                if(value.tmc_id) {
                     alert('successfully updated');
                 } else {
                     alert('successfully saved');   
                 }
                 try {
-                    const res = await fetch('./template.json');
+                    const res = await fetch('./template/edittemplate.json');
                     if(res.ok) {
                         templates = await res.json();
                         return {templates};

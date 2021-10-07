@@ -18,14 +18,12 @@
 <script>
 
     import { goto } from '@sapper/app';
-
-    // export let patients;
+    
     export let templates;
 
     let i = '#';
     let value = {};
     let name = '', last_name = '', gender = '1', option = '';
-    // let newTemplateName = '';
 
     $: selected = templates[i];
 	$: reset_inputs(selected);
@@ -44,15 +42,10 @@
 
     async function saveTemplateName() {
         if (i === '#') {
-            // value = {id: null, name: name, last_name: last_name, gender: gender, option: option};
             alert("Please select template name");
             return ;
         }
         let useTemplateInfo = {template_id: value.template_id, patient_id: value.patient_id, doctor_id: value.doctor_id, patient_name: name, patient_last_name: last_name, patient_gender: gender, patient_option: option};
-        // if (!newTemplateName) {
-        //     alert("Please write template name");
-        //     return ;
-        // }
         const functionName = 'useTemplate';
         const tmpName = { functionName, useTemplateInfo };
         try {
@@ -87,7 +80,6 @@
         border: 1px solid grey;
         border-radius: 5px;
         box-shadow: 3px 3px 3px grey;
-        /* height: 300px; */
         background-color: #f7f6f6;
     }
 
@@ -253,8 +245,6 @@
     <div class="template-box">      
         <div class="template-content">
             <div class='template-first'>
-                <!-- <span>Template Name: </span>
-                <input type="text" bind:value={newTemplateName} class="input-template" placeholder="please input template name..." /> -->
                 <span>Select Template: </span>
                 <select name="templateName" id="templateName" class="input-template" bind:value={i}>
                     <option value="#">--- select template ---</option>
@@ -264,13 +254,6 @@
                 </select>
             </div>
             <div class='template-second'>
-                <!-- <span>Patient List: </span>
-                <select name="patientselect" id="patientselect" bind:value={i}>
-                    <option value="#">--- select patient ---</option>
-                    {#each patients as pt, i}
-                        <option value={i}>{pt.name}</option>
-                    {/each}
-                </select> -->
                 <div class="patient-info">
                     <div>
                         <span>Name: </span><input type="text" bind:value={name} />

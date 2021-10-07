@@ -57,7 +57,7 @@ export function post(req, res) {
 
       }
       
-    } else if (functionName === 'saveTemplateInfo') {
+    } else if (functionName === 'saveTemplateInfopost') {
 
       var tmpInfo = req.body.value;
        db.query(`INSERT INTO template_content (template_id, doctor_id, patient_id, bp, puls, resprate, temp, height, weight, bmi, chiefcomplaint, hpi, subject, allergies, currentmeds, medicalhistory, socialhistory, familyhistory, object, assessment, plan) VALUES (${tmpInfo.id}, ${tmpInfo.doctor_id}, ${tmpInfo.patient_id}, '${tmpInfo.bp}', '${tmpInfo.puls}', '${tmpInfo.resprate}', '${tmpInfo.temp}', '${tmpInfo.height}', '${tmpInfo.weight}', '${tmpInfo.bmi}', '${tmpInfo.chiefcomplaint}', '${tmpInfo.hpi}', '${tmpInfo.subject}', '${tmpInfo.allergies}', '${tmpInfo.currentmeds}', '${tmpInfo.medicalhistory}', '${tmpInfo.socialhistory}', '${tmpInfo.familyhistory}', '${tmpInfo.object}', '${tmpInfo.assessment}', '${tmpInfo.plan}')`, (err, result) => {
@@ -68,34 +68,43 @@ export function post(req, res) {
         res.end(JSON.stringify(result));
       });
       
+    } else if (functionName === 'saveTemplateInfoput') {
+      var tmpInfo = req.body.value;
+      db.query(`UPDATE template_content SET bp='${tmpInfo.bp}', puls='${tmpInfo.puls}', resprate='${tmpInfo.resprate}', temp='${tmpInfo.temp}', height='${tmpInfo.height}', weight='${tmpInfo.weight}', bmi='${tmpInfo.bmi}', chiefcomplaint='${tmpInfo.chiefcomplaint}', hpi='${tmpInfo.hpi}', subject='${tmpInfo.subject}', allergies='${tmpInfo.allergies}', currentmeds='${tmpInfo.currentmeds}', medicalhistory='${tmpInfo.medicalhistory}', socialhistory='${tmpInfo.socialhistory}', familyhistory='${tmpInfo.familyhistory}', object='${tmpInfo.object}', assessment='${tmpInfo.assessment}', plan='${tmpInfo.plan}' WHERE id = ${tmpInfo.tmc_id}`, (err, result) => {
+         if(err) throw err;
+         res.writeHead(200, {
+           'Content-Type': 'application/json'
+         });
+         res.end(JSON.stringify(result));
+       });
     }
 }
 
-export async function put(req, res) {
-  console.log("put");
-  var functionName = req.body.functionName;
-  try {
-    if(functionName === 'saveTemplateInfo') {
+// export function put(req, res) {
+//   console.log("put");
+//   var functionName = req.body.functionName;
+//   try {
+//     if(functionName === 'saveTemplateInfo') {
      
-      var tmpInfo = req.body.value;
-      await db.query(`UPDATE template_content SET bp='${tmpInfo.bp}', puls='${tmpInfo.puls}', resprate='${tmpInfo.resprate}', temp='${tmpInfo.temp}', height='${tmpInfo.height}', weight='${tmpInfo.weight}', bmi='${tmpInfo.bmi}', chiefcomplaint='${tmpInfo.chiefcomplaint}', hpi='${tmpInfo.hpi}', subject='${tmpInfo.subject}', allergies='${tmpInfo.allergies}', currentmeds='${tmpInfo.currentmeds}', medicalhistory='${tmpInfo.medicalhistory}', socialhistory='${tmpInfo.socialhistory}', familyhistory='${tmpInfo.familyhistory}', object='${tmpInfo.object}', assessment='${tmpInfo.assessment}', plan='${tmpInfo.plan}' WHERE id = ${tmpInfo.tmc_id}`, (err, result) => {
-        if(err) throw err;
-        res.writeHead(200, {
-          'Content-Type': 'application/json'
-        });
-        res.end(JSON.stringify(result));
-      });
+//       var tmpInfo = req.body.value;
+//      db.query(`UPDATE template_content SET bp='${tmpInfo.bp}', puls='${tmpInfo.puls}', resprate='${tmpInfo.resprate}', temp='${tmpInfo.temp}', height='${tmpInfo.height}', weight='${tmpInfo.weight}', bmi='${tmpInfo.bmi}', chiefcomplaint='${tmpInfo.chiefcomplaint}', hpi='${tmpInfo.hpi}', subject='${tmpInfo.subject}', allergies='${tmpInfo.allergies}', currentmeds='${tmpInfo.currentmeds}', medicalhistory='${tmpInfo.medicalhistory}', socialhistory='${tmpInfo.socialhistory}', familyhistory='${tmpInfo.familyhistory}', object='${tmpInfo.object}', assessment='${tmpInfo.assessment}', plan='${tmpInfo.plan}' WHERE id = ${tmpInfo.tmc_id}`, (err, result) => {
+//         if(err) throw err;
+//         res.writeHead(200, {
+//           'Content-Type': 'application/json'
+//         });
+//         res.end(JSON.stringify(result));
+//       });
 
-    } 
+//     } 
 
-  } catch(e) {
-    console.error('index.json.js put:', e);
-    res.status(500).json({error: e.message});
-  }
+//   } catch(e) {
+//     console.error('index.json.js put:', e);
+//     res.status(500).json({error: e.message});
+//   }
 
-}
+// }
 
-export async function del(req, res) {
-  console.log("del");
-  console.log(req.body.value);
-}
+// export async function del(req, res) {
+//   console.log("del");
+//   console.log(req.body.value);
+// }
